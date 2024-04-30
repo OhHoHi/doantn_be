@@ -17,6 +17,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProductService {
@@ -71,4 +72,60 @@ public class ProductService {
             return null;
         }
     }
+
+    public List<Product> getAllProducts() {
+        return productRepository.findAll();
+    }
+
+    public boolean deleteProduct(Long productId) {
+        Optional<Product> optionalProduct = productRepository.findById(productId);
+        if (optionalProduct.isPresent()) {
+            Product product = optionalProduct.get();
+            productRepository.delete(product);
+            return true;
+        }
+        return false; // Trả về false nếu không tìm thấy sản phẩm cần xóa
+    }
+
+    public Product updateProduct(Long productId, ProductDTO productDTO) {
+
+
+        // Tìm kiếm sản phẩm dựa trên ID
+        Optional<Product> optionalProduct = productRepository.findById(productId);
+        if (optionalProduct.isPresent()) {
+            // Nếu sản phẩm tồn tại
+            Product existingProduct = optionalProduct.get();
+
+            // Kiểm tra nếu productDTO chứa tên thương hiệu mới
+            if (productDTO.getBrandsName() != null) {
+                // Lấy thông tin thương hiệu mới hoặc tạo mới nếu chưa tồn tại
+                Brands brands = brandsService.getOrCreateBrands(productDTO.getBrandsName());
+                // Gán thương hiệu mới cho sản phẩm
+                existingProduct.setBrands(brands);
+            }
+
+            // Cập nhật thông tin sản phẩm từ ProductDTO
+            existingProduct.setName(productDTO.getName());
+            existingProduct.setDescription(productDTO.getDescription());
+            existingProduct.setPrice(productDTO.getPrice());
+            existingProduct.setStatus(productDTO.getStatus());
+            existingProduct.setColor(productDTO.getColor());
+            existingProduct.setChatLieuKhungVot(productDTO.getChatLieuKhungVot());
+            existingProduct.setChatLieuThanVot(productDTO.getChatLieuThanVot());
+            existingProduct.setTrongLuong(productDTO.getTrongLuong());
+            existingProduct.setDoCung(productDTO.getDoCung());
+            existingProduct.setDiemCanBang(productDTO.getDiemCanBang());
+            existingProduct.setChieuDaiVot(productDTO.getChieuDaiVot());
+            existingProduct.setMucCangToiDa(productDTO.getMucCangToiDa());
+            existingProduct.setChuViCanCam(productDTO.getChuViCanCam());
+            existingProduct.setTrinhDoChoi(productDTO.getTrinhDoChoi());
+            existingProduct.setNoiDungChoi(productDTO.getNoiDungChoi());
+            // Lưu thông tin sản phẩm đã cập nhật và trả về
+            return productRepository.save(existingProduct);
+        } else {
+            // Nếu không tìm thấy sản phẩm, có thể trả về null hoặc xử lý theo yêu cầu cụ thể
+            return null;
+        }
+    }
+
 }

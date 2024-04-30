@@ -64,7 +64,7 @@ public class Product {
     @Column(name = "noi_dung_choi")
     private String noiDungChoi;
 
-    @Column(name = "description")
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
     @ManyToOne
