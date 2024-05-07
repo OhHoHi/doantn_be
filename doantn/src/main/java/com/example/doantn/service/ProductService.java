@@ -6,6 +6,8 @@ import com.example.doantn.entity.Brands;
 import com.example.doantn.entity.Product;
 import com.example.doantn.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,10 +25,14 @@ import java.util.Optional;
 public class ProductService {
 
     @Autowired
-    private ProductRepository productRepository;
+    private final ProductRepository productRepository;
 
     @Autowired
     private BrandsService brandsService;
+
+    public ProductService(ProductRepository productRepository) {
+        this.productRepository = productRepository;
+    }
 
     public UploadResponse addProduct(ProductDTO productDTO) {
         try {
@@ -72,11 +78,39 @@ public class ProductService {
             return null;
         }
     }
-
     public List<Product> getAllProducts() {
         return productRepository.findAll();
     }
+    public List<Product> getAllProductsPhanTrang(int offset, int size) {
+        return productRepository.findAll(PageRequest.of(offset / size, size)).getContent();
+    }
 
+    public List<Product> getAllProductsSortedByIdAsc(int offset, int size) {
+        return productRepository.findAllByOrderByIdAsc(PageRequest.of(offset / size, size));
+    }
+
+    public List<Product> getAllProductsSortedByIdDesc(int offset, int size) {
+        return productRepository.findAllByOrderByIdDesc(PageRequest.of(offset / size, size));
+    }
+
+    public List<Product> getAllProductsSortedByPriceAsc(int offset, int size) {
+        return productRepository.findAllByOrderByPriceAsc(PageRequest.of(offset / size, size));
+    }
+
+    public List<Product> getAllProductsSortedByPriceDesc(int offset, int size) {
+        return productRepository.findAllByOrderByPriceDesc(PageRequest.of(offset / size, size));
+    }
+
+    public List<Product> getAllProductsSortedByNameAsc(int offset, int size) {
+        return productRepository.findAllByOrderByNameAsc(PageRequest.of(offset / size, size));
+    }
+
+    public List<Product> getAllProductsSortedByNameDesc(int offset, int size) {
+        return productRepository.findAllByOrderByNameDesc(PageRequest.of(offset / size, size));
+    }
+    public List<Product> searchProductsByName(String name) {
+        return productRepository.findByNameContainingIgnoreCase(name);
+    }
     public boolean deleteProduct(Long productId) {
         Optional<Product> optionalProduct = productRepository.findById(productId);
         if (optionalProduct.isPresent()) {
