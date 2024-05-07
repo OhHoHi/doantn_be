@@ -2,7 +2,9 @@ package com.example.doantn.controller;
 
 import com.example.doantn.Response.UploadResponse;
 import com.example.doantn.dto.ProductDTO;
+import com.example.doantn.entity.CartItem;
 import com.example.doantn.entity.Product;
+import com.example.doantn.service.CartItemService;
 import com.example.doantn.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,6 +24,8 @@ public class ProductController {
     @Autowired
     private ProductService productService;
 
+    @Autowired
+    private CartItemService cartItemService;
     @PostMapping("/addProduct")
     public ResponseEntity<UploadResponse> addProduct(@ModelAttribute ProductDTO productDTO) {
         UploadResponse response = productService.addProduct(productDTO);
@@ -50,8 +54,24 @@ public class ProductController {
             return ResponseEntity.notFound().build();
         }
     }
+//    @DeleteMapping("/delete/{id}")
+//    public ResponseEntity<String> deleteProduct(@PathVariable("id") Long productId) {
+//        boolean isDeleted = productService.deleteProduct(productId);
+//        if (isDeleted) {
+//            return ResponseEntity.ok("Product with ID " + productId + " has been deleted successfully.");
+//        } else {
+//            return ResponseEntity.notFound().build();
+//        }
+//    }
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteProduct(@PathVariable("id") Long productId) {
+        // Kiểm tra xem sản phẩm có tồn tại trong bất kỳ giỏ hàng nào không
+        List<CartItem> cartItems = cartItemService.getCartItemsByProductId(productId);
+        if (!cartItems.isEmpty()) {
+            // Nếu sản phẩm tồn tại trong giỏ hàng, xóa nó khỏi tất cả các giỏ hàng
+            cartItems.forEach(cartItem -> cartItemService.removeFromCart(cartItem));
+        }
+        // Sau đó xóa sản phẩm
         boolean isDeleted = productService.deleteProduct(productId);
         if (isDeleted) {
             return ResponseEntity.ok("Product with ID " + productId + " has been deleted successfully.");

@@ -1,7 +1,7 @@
 package com.example.doantn.service;
 
-import ch.qos.logback.core.model.Model;
 import com.example.doantn.dto.UserDTO;
+import com.example.doantn.dto.UserUpdateRequest;
 import com.example.doantn.entity.Role;
 import com.example.doantn.entity.User;
 import com.example.doantn.repository.RoleRepository;
@@ -9,12 +9,12 @@ import com.example.doantn.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -58,4 +58,43 @@ public class UserServiceImpl implements UserService{
         newUser.getRoles().add(userRole);
         userRepository.save(newUser);
     }
+    @Override
+    public User getUserById(Long userId) {
+        return userRepository.findById(userId).orElse(null);
+    }
+
+    @Override
+    public void changePassword(Long userId, String oldPassword, String newPassword) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        // Kiểm tra mật khẩu cũ
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            throw new IllegalArgumentException("Old password is incorrect");
+        }
+
+        // Cập nhật mật khẩu mới
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
+
+    public User updateUser(Long userId, UserUpdateRequest userUpdateRequest) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        // Cập nhật thông tin người dùng nếu được cung cấp
+        if (userUpdateRequest.getFullName() != null && !userUpdateRequest.getFullName().trim().isEmpty()) {
+            user.setFull_name(userUpdateRequest.getFullName().trim());
+        }
+        if (userUpdateRequest.getEmail() != null && !userUpdateRequest.getEmail().trim().isEmpty()) {
+            user.setEmail(userUpdateRequest.getEmail().trim());
+        }
+        if (userUpdateRequest.getUserName() != null && !userUpdateRequest.getUserName().trim().isEmpty()) {
+            user.setUser_name(userUpdateRequest.getUserName().trim());
+        }
+        return userRepository.save(user);
+    }
+
+
+
 }

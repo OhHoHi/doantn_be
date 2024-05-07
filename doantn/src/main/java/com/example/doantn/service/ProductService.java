@@ -127,5 +127,10 @@ public class ProductService {
             return null;
         }
     }
+    public Product getProductById(Long productId) {
+        // Sử dụng productRepository để tìm kiếm sản phẩm trong cơ sở dữ liệu
+        Optional<Product> optionalProduct = productRepository.findById(productId);
+        return optionalProduct.orElse(null);
+    }
 
 }

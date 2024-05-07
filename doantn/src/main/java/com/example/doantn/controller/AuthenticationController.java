@@ -23,10 +23,15 @@ public class AuthenticationController {
 //        this.authenticationService = authenticationService;
 //    }
 
-    @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> login(@RequestBody AuthenticationRequest authenticationRequest){
-        return  ResponseEntity.ok(authenticationService.authenticate(authenticationRequest));
-    }
+//    @PostMapping("/login")
+//    public ResponseEntity<AuthenticationResponse> login(@RequestBody AuthenticationRequest authenticationRequest){
+//        return  ResponseEntity.ok(authenticationService.authenticate(authenticationRequest));
+//    }
+@PostMapping("/login")
+public ResponseEntity<AuthenticationResponse> login(@RequestBody AuthenticationRequest authenticationRequest) {
+    AuthenticationResponse response = authenticationService.authenticate(authenticationRequest);
+    return ResponseEntity.ok(response);
+}
 
 
 

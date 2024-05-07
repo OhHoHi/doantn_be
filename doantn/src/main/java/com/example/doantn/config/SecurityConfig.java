@@ -26,6 +26,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/**").permitAll()
+                        .requestMatchers("/api/cart/**").permitAll()
                         .requestMatchers("/products/**").permitAll()
                         .requestMatchers("/products/addProduct").hasAnyAuthority("ROLE_ADMIN")
                         .requestMatchers("/products/edit/").hasAnyAuthority("ROLE_ADMIN")
