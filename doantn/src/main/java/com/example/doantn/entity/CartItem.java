@@ -1,5 +1,6 @@
 package com.example.doantn.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,6 +15,11 @@ public class CartItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+//    @JsonIgnore
+//    @ManyToOne
+//    @JoinColumn(name = "order_id")
+//    private Order order;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
@@ -27,5 +33,7 @@ public class CartItem {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-    }
+
+
+}
 

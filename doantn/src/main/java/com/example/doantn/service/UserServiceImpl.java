@@ -15,6 +15,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import java.util.List;
+
 
 @Service
 @RequiredArgsConstructor
@@ -93,6 +95,16 @@ public class UserServiceImpl implements UserService{
             user.setUser_name(userUpdateRequest.getUserName().trim());
         }
         return userRepository.save(user);
+    }
+
+    @Override
+    public boolean existsById(Long userId) {
+        return userRepository.existsById(userId);
+    }
+
+    @Override
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 
 

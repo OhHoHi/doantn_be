@@ -47,7 +47,7 @@ public class Product {
     private String doCung;
 
     @Column(name = "diem_can_bang")
-    private String diemCanBang;
+    private int diemCanBang;
 
     @Column(name = "chieu_dai_vot")
     private String chieuDaiVot;

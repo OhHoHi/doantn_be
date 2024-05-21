@@ -26,6 +26,9 @@ public class User implements UserDetails {
     private String email;
     private String password;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Address> addresses = new HashSet<>();
+
     @ManyToMany
     @JoinTable(name ="users_role" ,
     joinColumns = @JoinColumn(name = "Users_Id") , inverseJoinColumns = @JoinColumn(name="Roles_Id"))

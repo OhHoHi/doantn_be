@@ -13,13 +13,12 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class ProductService {
@@ -59,7 +58,7 @@ public class ProductService {
             product.setChatLieuThanVot(productDTO.getChatLieuThanVot());
             product.setTrongLuong(productDTO.getTrongLuong());
             product.setDoCung(productDTO.getDoCung());
-            product.setDiemCanBang(productDTO.getDiemCanBang());
+            product.setDiemCanBang(Integer.parseInt(productDTO.getDiemCanBang()));
             product.setChieuDaiVot(productDTO.getChieuDaiVot());
             product.setMucCangToiDa(productDTO.getMucCangToiDa());
             product.setChuViCanCam(productDTO.getChuViCanCam());
@@ -148,7 +147,7 @@ public class ProductService {
             existingProduct.setChatLieuThanVot(productDTO.getChatLieuThanVot());
             existingProduct.setTrongLuong(productDTO.getTrongLuong());
             existingProduct.setDoCung(productDTO.getDoCung());
-            existingProduct.setDiemCanBang(productDTO.getDiemCanBang());
+            existingProduct.setDiemCanBang(Integer.parseInt(productDTO.getDiemCanBang()));
             existingProduct.setChieuDaiVot(productDTO.getChieuDaiVot());
             existingProduct.setMucCangToiDa(productDTO.getMucCangToiDa());
             existingProduct.setChuViCanCam(productDTO.getChuViCanCam());
@@ -167,4 +166,238 @@ public class ProductService {
         return optionalProduct.orElse(null);
     }
 
+//    public List<Product> getProductsByBrand(Long brandId) {
+//        return productRepository.findByBrandsId(brandId);
+//    }
+
+    public List<Product> getProductsByBrandId(Long brandId, int page, int size) {
+        return productRepository.findByBrandsId(brandId, PageRequest.of(page, size));
+    }
+
+    public List<Product> getProductsByBrandIdAndSort(Long brandId, int page, int size, String sort) {
+        List<Product> products = productRepository.findByBrandsId(brandId, PageRequest.of(page, size)); // Lấy danh sách sản phẩm theo brandId
+
+        // Sắp xếp danh sách sản phẩm nếu tham số sort được truyền vào từ frontend
+        if (sort != null) {
+            switch (sort) {
+                case "id_asc":
+                    Collections.sort(products, Comparator.comparing(Product::getId));
+                    break;
+                case "id_desc":
+                    Collections.sort(products, Comparator.comparing(Product::getId).reversed());
+                    break;
+                case "price_asc":
+                    Collections.sort(products, Comparator.comparing(Product::getPrice));
+                    break;
+                case "price_desc":
+                    Collections.sort(products, Comparator.comparing(Product::getPrice).reversed());
+                    break;
+                case "name_asc":
+                    Collections.sort(products, Comparator.comparing(Product::getName));
+                    break;
+                case "name_desc":
+                    Collections.sort(products, Comparator.comparing(Product::getName).reversed());
+                    break;
+                default:
+                    // Không sắp xếp
+                    break;
+            }
+        }
+
+        return products;
+    }
+    public List<Product> getAllProductsPhanTrang1(String sort, int offset, int size) {
+        List<Product> products = productRepository.findAll(PageRequest.of(offset / size, size)).getContent();
+        // Sắp xếp danh sách sản phẩm nếu tham số sort được truyền vào từ frontend
+        if (sort != null) {
+            switch (sort) {
+                case "id_asc":
+                    Collections.sort(products, Comparator.comparing(Product::getId));
+                    break;
+                case "id_desc":
+                    Collections.sort(products, Comparator.comparing(Product::getId).reversed());
+                    break;
+                case "price_asc":
+                    Collections.sort(products, Comparator.comparing(Product::getPrice));
+                    break;
+                case "price_desc":
+                    Collections.sort(products, Comparator.comparing(Product::getPrice).reversed());
+                    break;
+                case "name_asc":
+                    Collections.sort(products, Comparator.comparing(Product::getName));
+                    break;
+                case "name_desc":
+                    Collections.sort(products, Comparator.comparing(Product::getName).reversed());
+                    break;
+                default:
+                    // Không sắp xếp
+                    break;
+            }
+        }
+        return products;
+    }
+    public List<Product> searchProductByNameAndSort(String productName , int page, int size, String sort) {
+        // Triển khai logic để tìm kiếm sản phẩm theo tên sản phẩm
+        // Ví dụ: tìm kiếm trong cơ sở dữ liệu
+        List<Product> searchedProducts = productRepository.findByNameContaining(productName , PageRequest.of(page, size));
+
+        // Sắp xếp danh sách sản phẩm nếu tham số sort được truyền vào từ frontend
+        if (sort != null) {
+            switch (sort) {
+                case "id_asc":
+                    Collections.sort(searchedProducts, Comparator.comparing(Product::getId));
+                    break;
+                case "id_desc":
+                    Collections.sort(searchedProducts, Comparator.comparing(Product::getId).reversed());
+                    break;
+                case "price_asc":
+                    Collections.sort(searchedProducts, Comparator.comparing(Product::getPrice));
+                    break;
+                case "price_desc":
+                    Collections.sort(searchedProducts, Comparator.comparing(Product::getPrice).reversed());
+                    break;
+                case "name_asc":
+                    Collections.sort(searchedProducts, Comparator.comparing(Product::getName));
+                    break;
+                case "name_desc":
+                    Collections.sort(searchedProducts, Comparator.comparing(Product::getName).reversed());
+                    break;
+                default:
+                    // Không sắp xếp
+                    break;
+            }
+        }
+        return searchedProducts;
+    }
+
+//    public List<Product> searchProduct(Long brandId, int page, int size, String sort, String productName, BigDecimal minPrice, BigDecimal maxPrice) {
+//        List<Product> products;
+//
+//        // Tìm kiếm theo brand
+//        if (productName == null && minPrice == null && maxPrice == null) {
+//            products = productRepository.findByBrandsId(brandId, PageRequest.of(page, size));
+//        }
+//        // Tìm kiếm theo tên
+//        else if (brandId == null && minPrice == null && maxPrice == null) {
+//            // Tìm kiếm theo tên và brand
+//            if (productName != null) {
+//                products = productRepository.findByBrandsIdAndNameContaining(productName, brandId);
+//            } else {
+//                products = productRepository.findByNameContaining(productName, PageRequest.of(page, size));
+//            }
+//        }
+//        // Tìm kiếm theo giá
+//        else if (productName == null && brandId == null) {
+//            products = productRepository.findByPriceBetween(minPrice, maxPrice);
+//        }
+//        // Tìm kiếm theo brand + giá
+//        else if (productName == null) {
+//            products = productRepository.findByBrandsIdAndPriceBetween(brandId, minPrice, maxPrice);
+//        }
+//        // Trường hợp còn lại, trả về danh sách sản phẩm mặc định
+//        else {
+//            products = productRepository.findAll(PageRequest.of(page, size)).getContent();
+//        }
+//
+//        return products;
+//    }
+public List<Product> searchProduct(Long brandId, int page, int size, String sort, String productName, BigDecimal minPrice, BigDecimal maxPrice , int diemCanBang) {
+    List<Product> products;
+
+    if(productName == null && minPrice == null && maxPrice == null && brandId == null && diemCanBang == 0 ){
+         products = productRepository.findAll(PageRequest.of(page, size)).getContent();
+    }
+    // Tìm kiếm theo diem can bang
+    else if (productName == null && minPrice == null && maxPrice == null && brandId == null && diemCanBang != 0) {
+        if (diemCanBang <= 285) {
+            products = productRepository.findByDiemCanBangLessThan(diemCanBang, PageRequest.of(page, size));
+        } else if (diemCanBang <= 295) {
+            products = productRepository.findByDiemCanBangBetween(285, 295, PageRequest.of(page, size));
+        } else {
+            products = productRepository.findByDiemCanBangGreaterThan(diemCanBang, PageRequest.of(page, size));
+        }
+    }
+    else if (productName == null && minPrice == null && maxPrice == null && diemCanBang != 0) {
+        if (diemCanBang <= 285) {
+            products = productRepository.findByBrandsIdAndDiemCanBangLessThan(brandId,diemCanBang, PageRequest.of(page, size));
+        } else if (diemCanBang <= 295) {
+            products = productRepository.findByBrandsIdAndDiemCanBangBetween(brandId ,285, 295, PageRequest.of(page, size));
+        } else {
+            products = productRepository.findByBrandsIdAndDiemCanBangGreaterThan(brandId,diemCanBang, PageRequest.of(page, size));
+        }
+    }
+    else if (productName == null && brandId == null && diemCanBang != 0) {
+        if (diemCanBang <= 285) {
+            products = productRepository.findByDiemCanBangLessThanAndPriceBetween(diemCanBang,minPrice,maxPrice, PageRequest.of(page, size));
+        } else if (diemCanBang <= 295) {
+            products = productRepository.findByDiemCanBangBetweenAndPriceBetween(285, 295,minPrice ,maxPrice, PageRequest.of(page, size));
+        } else {
+            products = productRepository.findByDiemCanBangGreaterThanAndPriceBetween(diemCanBang,minPrice , maxPrice, PageRequest.of(page, size));
+        }
+    }
+    else if (productName == null && diemCanBang != 0) {
+        if (diemCanBang <= 285) {
+            products = productRepository.findByBrandsIdAndDiemCanBangLessThanAndPriceBetween( brandId, diemCanBang,minPrice,maxPrice);
+        } else if (diemCanBang <= 295) {
+            products = productRepository.findByBrandsIdAndDiemCanBangBetweenAndPriceBetween(brandId,285, 295,minPrice ,maxPrice);
+        } else {
+            products = productRepository.findByBrandsIdAndDiemCanBangGreaterThanAndPriceBetween(brandId,diemCanBang,minPrice , maxPrice);
+        }
+    }
+    // Tìm kiếm theo brand
+    else if (productName == null && minPrice == null && maxPrice == null) {
+        products = productRepository.findByBrandsId(brandId, PageRequest.of(page, size));
+    }
+    // Tìm kiếm theo tên
+    else if (brandId == null && minPrice == null && maxPrice == null) {
+        if (productName != null) {
+            products = productRepository.findByNameContaining(productName, PageRequest.of(page, size));
+        } else {
+            products = productRepository.findAll(PageRequest.of(page, size)).getContent();
+        }
+    }
+    // Tìm kiếm theo giá
+    else if (productName == null && brandId == null) {
+        products = productRepository.findByPriceBetween(minPrice, maxPrice);
+    }
+    // Tìm kiếm theo brand + giá
+    else if (productName == null) {
+        products = productRepository.findByBrandsIdAndPriceBetween(brandId, minPrice, maxPrice);
+    }
+    // Trường hợp còn lại, trả về danh sách sản phẩm mặc định
+    else {
+        products = productRepository.findAll(PageRequest.of(page, size)).getContent();
+    }
+    return products;
+}
+
+public void sapXep(String sort , List<Product> products){
+
+    // Sắp xếp danh sách sản phẩm nếu tham số sort được truyền vào từ frontend
+    if (sort != null) {
+        switch (sort) {
+            case "id_asc":
+                Collections.sort(products, Comparator.comparing(Product::getId));
+                break;
+            case "id_desc":
+                Collections.sort(products, Comparator.comparing(Product::getId).reversed());
+                break;
+            case "price_asc":
+                Collections.sort(products, Comparator.comparing(Product::getPrice));
+                break;
+            case "price_desc":
+                Collections.sort(products, Comparator.comparing(Product::getPrice).reversed());
+                break;
+            case "name_asc":
+                Collections.sort(products, Comparator.comparing(Product::getName));
+                break;
+            case "name_desc":
+                Collections.sort(products, Comparator.comparing(Product::getName).reversed());
+                break;
+            default:
+                // Không sắp xếp
+                break;
+        }
+    }
+}
 }

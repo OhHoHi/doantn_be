@@ -5,6 +5,8 @@ import com.example.doantn.dto.UserUpdateRequest;
 import com.example.doantn.entity.Role;
 import com.example.doantn.entity.User;
 
+import java.util.List;
+
 public interface UserService {
     User saveUser(User user);
     Role saveRole(Role role);
@@ -14,5 +16,10 @@ public interface UserService {
     void changePassword(Long userId, String oldPassword, String newPassword);
 
     User updateUser(Long userId, UserUpdateRequest userUpdateRequest);
+
+    List<User> getAllUsers();
+
+    boolean existsById( Long userId);
+
 
 }
