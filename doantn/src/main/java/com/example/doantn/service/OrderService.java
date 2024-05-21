@@ -1,10 +1,13 @@
 package com.example.doantn.service;
 
+import com.example.doantn.dto.MonthlyRevenueDTO;
 import com.example.doantn.dto.OrderItemDTO;
 import com.example.doantn.dto.OrderRequest;
+import com.example.doantn.dto.ProductRevenueDTO;
 import com.example.doantn.entity.*;
 import com.example.doantn.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -115,4 +118,10 @@ public class OrderService {
         return orderRepository.findByUserIdAndStatusOutsideOneToThree(userId);
     }
 
+    public List<MonthlyRevenueDTO> getMonthlyRevenue() {
+        return orderRepository.findMonthlyRevenue();
+    }
+    public List<ProductRevenueDTO> getTop10ProductRevenueByStatusOutsideOneToThree() {
+        return orderRepository.findTop10ProductsByRevenue(PageRequest.of(0, 10));
+    }
 }

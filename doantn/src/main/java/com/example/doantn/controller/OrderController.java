@@ -1,6 +1,8 @@
 package com.example.doantn.controller;
 
+import com.example.doantn.dto.MonthlyRevenueDTO;
 import com.example.doantn.dto.OrderRequest;
+import com.example.doantn.dto.ProductRevenueDTO;
 import com.example.doantn.entity.Order;
 import com.example.doantn.entity.OrderItem;
 import com.example.doantn.service.OrderService;
@@ -89,6 +91,18 @@ public class OrderController {
     public ResponseEntity<List<Order>> getOrdersWithStatusOutsideOneToThree(@PathVariable Long userId) {
         List<Order> orders = orderService.getOrdersWithStatusOutsideOneToThree(userId);
         return ResponseEntity.ok(orders);
+    }
+
+    @GetMapping("/monthly-revenue")
+    public ResponseEntity<List<MonthlyRevenueDTO>> getMonthlyRevenue() {
+        List<MonthlyRevenueDTO> monthlyRevenue = orderService.getMonthlyRevenue();
+        return ResponseEntity.ok(monthlyRevenue);
+    }
+
+    @GetMapping("/product-revenue/top-10")
+    public ResponseEntity<List<ProductRevenueDTO>> getTop10ProductRevenueByStatusOutsideOneToThree() {
+        List<ProductRevenueDTO> productRevenues = orderService.getTop10ProductRevenueByStatusOutsideOneToThree();
+        return ResponseEntity.ok(productRevenues);
     }
 
 
