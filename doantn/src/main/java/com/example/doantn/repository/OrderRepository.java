@@ -4,6 +4,7 @@ import com.example.doantn.dto.MonthlyRevenueDTO;
 import com.example.doantn.dto.ProductRevenueDTO;
 import com.example.doantn.entity.Order;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -28,7 +29,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByStatusBetweenOneAndThree();
 
     @Query("SELECT o FROM Order o WHERE o.status < 1 OR o.status > 2")
-    List<Order> findByStatusOutsideOneToThree();
+    List<Order> findByStatusOutsideOneToThree(Pageable pageable);
 
     @Query("SELECT o FROM Order o WHERE o.user.id = :userId AND o.status = 0")
     List<Order> findByUserIdAndStatusZero(Long userId);
@@ -36,8 +37,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query("SELECT o FROM Order o WHERE o.user.id = :userId AND o.status > 0 AND o.status < 3")
     List<Order> findByUserIdAndStatusBetweenOneAndThree(Long userId);
 
-    @Query("SELECT o FROM Order o WHERE o.user.id = :userId AND (o.status < 1 OR o.status > 2)")
-    List<Order> findByUserIdAndStatusOutsideOneToThree(Long userId);
+    @Query("SELECT o FROM Order o WHERE o.user.id = :userId AND (o.status < 0 OR o.status > 2)")
+    List<Order> findByUserIdAndStatusOutsideOneToThree(Long userId , Pageable pageable);
 
 
     @Query("SELECT new com.example.doantn.dto.MonthlyRevenueDTO(FUNCTION('MONTH', o.orderDate), FUNCTION('YEAR', o.orderDate), SUM(oi.quantity * oi.product.price)) " +
@@ -53,4 +54,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             "GROUP BY oi.product.id, oi.product.name " +
             "ORDER BY SUM(oi.quantity * oi.product.price) DESC")
     List<ProductRevenueDTO> findTop10ProductsByRevenue(PageRequest pageRequest);
+
+
 }

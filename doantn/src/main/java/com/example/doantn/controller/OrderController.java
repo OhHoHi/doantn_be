@@ -70,26 +70,38 @@ public class OrderController {
     }
 
     @GetMapping("/status/outside-1-to-3")
-    public ResponseEntity<List<Order>> getOrdersWithStatusOutsideOneToThree() {
-        List<Order> orders = orderService.getOrdersWithStatusOutsideOneToThree();
+    public ResponseEntity<List<Order>> getOrdersWithStatusOutsideOneToThree(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        List<Order> orders = orderService.getOrdersWithStatusOutsideOneToThree(page , size);
         return ResponseEntity.ok(orders);
     }
 
     @GetMapping("/user/{userId}/status/0")
-    public ResponseEntity<List<Order>> getOrdersWithStatusZero(@PathVariable Long userId) {
-        List<Order> orders = orderService.getOrdersWithStatusZero(userId);
+    public ResponseEntity<List<Order>> getOrdersWithStatusZero(
+            @PathVariable Long userId
+    ) {
+        List<Order> orders = orderService.getOrdersWithStatusZero(userId );
         return ResponseEntity.ok(orders);
     }
 
     @GetMapping("/user/{userId}/status/between-1-and-3")
-    public ResponseEntity<List<Order>> getOrdersWithStatusBetweenOneAndThree(@PathVariable Long userId) {
+    public ResponseEntity<List<Order>> getOrdersWithStatusBetweenOneAndThree(
+            @PathVariable Long userId
+    ) {
         List<Order> orders = orderService.getOrdersWithStatusBetweenOneAndThree(userId);
         return ResponseEntity.ok(orders);
     }
 
     @GetMapping("/user/{userId}/status/outside-1-to-3")
-    public ResponseEntity<List<Order>> getOrdersWithStatusOutsideOneToThree(@PathVariable Long userId) {
-        List<Order> orders = orderService.getOrdersWithStatusOutsideOneToThree(userId);
+    public ResponseEntity<List<Order>> getOrdersWithStatusOutsideOneToThree(
+            @PathVariable Long userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+
+    ) {
+        List<Order> orders = orderService.getOrdersWithStatusOutsideOneToThree(userId , page, size);
         return ResponseEntity.ok(orders);
     }
 

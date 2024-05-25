@@ -102,20 +102,20 @@ public class OrderService {
         return orderRepository.findByStatusBetweenOneAndThree();
     }
 
-    public List<Order> getOrdersWithStatusOutsideOneToThree() {
-        return orderRepository.findByStatusOutsideOneToThree();
+    public List<Order> getOrdersWithStatusOutsideOneToThree(int page, int size) {
+        return orderRepository.findByStatusOutsideOneToThree( PageRequest.of(page, size));
     }
 
-    public List<Order> getOrdersWithStatusZero(Long userId) {
+    public List<Order> getOrdersWithStatusZero(Long userId ) {
         return orderRepository.findByUserIdAndStatusZero(userId);
     }
 
-    public List<Order> getOrdersWithStatusBetweenOneAndThree(Long userId) {
+    public List<Order> getOrdersWithStatusBetweenOneAndThree(Long userId ) {
         return orderRepository.findByUserIdAndStatusBetweenOneAndThree(userId);
     }
 
-    public List<Order> getOrdersWithStatusOutsideOneToThree(Long userId) {
-        return orderRepository.findByUserIdAndStatusOutsideOneToThree(userId);
+    public List<Order> getOrdersWithStatusOutsideOneToThree(Long userId , int page, int size) {
+        return orderRepository.findByUserIdAndStatusOutsideOneToThree(userId , PageRequest.of(page, size));
     }
 
     public List<MonthlyRevenueDTO> getMonthlyRevenue() {
