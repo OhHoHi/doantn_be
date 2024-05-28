@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -35,6 +36,10 @@ public class OrderService {
 
     @Autowired
     private OrderItemRepository orderItemRepository;
+
+    @Autowired
+    private NotificationRepository notificationRepository;
+
 
 
 
@@ -89,7 +94,49 @@ public class OrderService {
                 .orElseThrow(() -> new IllegalArgumentException("Order not found"));
         int newStatus = order.getStatus() + 1;
         order.setStatus(newStatus);
+        Order updatedOrder = orderRepository.save(order);
+
+        // Tạo thông báo mới
+        createAndSaveNotification(order, newStatus);
+
+        return updatedOrder;
+    }
+    public Order decreaseOrderStatus(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
+        int newStatus = order.getStatus() - 1;
+        order.setStatus(newStatus);
         return orderRepository.save(order);
+    }
+    private void createAndSaveNotification(Order order, int newStatus) {
+        String message;
+        switch (newStatus) {
+            case 1:
+                message = "Đơn hàng "+ order.getId() +" của bạn đang được chuẩn bị";
+                break;
+            case 2:
+                message = "Đơn hàng "+ order.getId() +" của bạn đã được chuyển đi";
+                break;
+            case 3:
+                message = "Đơn hàng "+ order.getId() +" đã được giao thành công";
+                break;
+            default:
+                if (newStatus > 3) {
+                    message = "Đơn hàng "+ order.getId() +" của bạn đã được giao thành công";
+                } else {
+                    message = "Your order status has been updated.";
+                }
+                break;
+        }
+
+        Notification notification = new Notification();
+        notification.setMessage(message);
+        notification.setSentDateTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        notification.setUser(order.getUser());
+        notificationRepository.save(notification);
+
+        // Giả lập gửi thông báo (có thể gửi qua email, SMS, v.v.)
+        // sendNotification(notification);
     }
     public List<Order> getOrdersWithStatusZero() {
         return orderRepository.findByStatusZero();
@@ -116,6 +163,14 @@ public class OrderService {
 
     public List<Order> getOrdersWithStatusOutsideOneToThree(Long userId , int page, int size) {
         return orderRepository.findByUserIdAndStatusOutsideOneToThree(userId , PageRequest.of(page, size));
+    }
+
+    public List<Order> getOrdersByStatusLessThanZeroAndUserId(Long userId) {
+        return orderRepository.findByStatusLessThanZeroAndUserId(userId);
+    }
+
+    public List<Order> getOrdersByStatusLessThanZero() {
+        return orderRepository.findByStatusLessThanZero();
     }
 
     public List<MonthlyRevenueDTO> getMonthlyRevenue() {

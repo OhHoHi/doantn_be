@@ -28,7 +28,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query("SELECT o FROM Order o WHERE o.status > 0 AND o.status < 3")
     List<Order> findByStatusBetweenOneAndThree();
 
-    @Query("SELECT o FROM Order o WHERE o.status < 1 OR o.status > 2")
+    @Query("SELECT o FROM Order o WHERE  o.status > 2")
     List<Order> findByStatusOutsideOneToThree(Pageable pageable);
 
     @Query("SELECT o FROM Order o WHERE o.user.id = :userId AND o.status = 0")
@@ -37,9 +37,14 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query("SELECT o FROM Order o WHERE o.user.id = :userId AND o.status > 0 AND o.status < 3")
     List<Order> findByUserIdAndStatusBetweenOneAndThree(Long userId);
 
-    @Query("SELECT o FROM Order o WHERE o.user.id = :userId AND (o.status < 0 OR o.status > 2)")
+    @Query("SELECT o FROM Order o WHERE o.user.id = :userId AND (o.status > 2)")
     List<Order> findByUserIdAndStatusOutsideOneToThree(Long userId , Pageable pageable);
 
+    @Query("SELECT o FROM Order o WHERE o.status < 0")
+    List<Order> findByStatusLessThanZero();
+
+    @Query("SELECT o FROM Order o WHERE o.status < 0 AND o.user.id = :userId")
+    List<Order> findByStatusLessThanZeroAndUserId(Long userId);
 
     @Query("SELECT new com.example.doantn.dto.MonthlyRevenueDTO(FUNCTION('MONTH', o.orderDate), FUNCTION('YEAR', o.orderDate), SUM(oi.quantity * oi.product.price)) " +
             "FROM Order o JOIN o.orderItems oi " +
@@ -54,6 +59,5 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             "GROUP BY oi.product.id, oi.product.name " +
             "ORDER BY SUM(oi.quantity * oi.product.price) DESC")
     List<ProductRevenueDTO> findTop10ProductsByRevenue(PageRequest pageRequest);
-
 
 }

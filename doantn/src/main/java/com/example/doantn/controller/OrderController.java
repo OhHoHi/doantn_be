@@ -50,6 +50,11 @@ public class OrderController {
         Order updatedOrder = orderService.increaseOrderStatus(orderId);
         return new ResponseEntity<>(updatedOrder, HttpStatus.OK);
     }
+    @PutMapping("/decreaseStatus/{orderId}")
+    public ResponseEntity<Order> decreaseOrderStatus(@PathVariable Long orderId) {
+        Order updatedOrder = orderService.decreaseOrderStatus(orderId);
+        return new ResponseEntity<>(updatedOrder, HttpStatus.OK);
+    }
 
     @GetMapping("/status/0")
     public ResponseEntity<List<Order>> getOrdersWithStatusZero() {
@@ -103,6 +108,16 @@ public class OrderController {
     ) {
         List<Order> orders = orderService.getOrdersWithStatusOutsideOneToThree(userId , page, size);
         return ResponseEntity.ok(orders);
+    }
+
+    @GetMapping("/user/{userId}/status/less-than-zero")
+    public List<Order> getOrdersByStatusLessThanZeroAndUserId(@PathVariable Long userId) {
+        return orderService.getOrdersByStatusLessThanZeroAndUserId(userId);
+    }
+
+    @GetMapping("/status/less-than-zero")
+    public List<Order> getOrdersByStatusLessThanZero() {
+        return orderService.getOrdersByStatusLessThanZero();
     }
 
     @GetMapping("/monthly-revenue")
