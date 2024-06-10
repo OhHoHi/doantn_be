@@ -48,14 +48,15 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query("SELECT new com.example.doantn.dto.MonthlyRevenueDTO(FUNCTION('MONTH', o.orderDate), FUNCTION('YEAR', o.orderDate), SUM(oi.quantity * oi.product.price)) " +
             "FROM Order o JOIN o.orderItems oi " +
-            "WHERE o.status <> 0 " + // Assuming you want to exclude orders with status 0
+            "WHERE o.status > 2 " + // Assuming you want to exclude orders with status 0
             "GROUP BY FUNCTION('MONTH', o.orderDate), FUNCTION('YEAR', o.orderDate) " +
             "ORDER BY FUNCTION('YEAR', o.orderDate), FUNCTION('MONTH', o.orderDate)")
     List<MonthlyRevenueDTO> findMonthlyRevenue();
 
 
     @Query("SELECT new com.example.doantn.dto.ProductRevenueDTO(oi.product.id, oi.product.name, SUM(oi.quantity * oi.product.price)) " +
-            "FROM OrderItem oi " +
+            "FROM OrderItem oi JOIN oi.order o " +  // Thêm join với Order để có thể sử dụng điều kiện cho status
+            "WHERE o.status > 2 " +  // Thêm điều kiện cho status > 2
             "GROUP BY oi.product.id, oi.product.name " +
             "ORDER BY SUM(oi.quantity * oi.product.price) DESC")
     List<ProductRevenueDTO> findTop10ProductsByRevenue(PageRequest pageRequest);
