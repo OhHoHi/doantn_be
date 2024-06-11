@@ -1,5 +1,6 @@
 package com.example.doantn.controller;
 
+import com.example.doantn.dto.CancelOrderRequest;
 import com.example.doantn.dto.MonthlyRevenueDTO;
 import com.example.doantn.dto.OrderRequest;
 import com.example.doantn.dto.ProductRevenueDTO;
@@ -28,6 +29,10 @@ public class OrderController {
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
+    }
+    @PostMapping("/addQuantity")
+    public String addProductQuantity(@RequestParam Long productId, @RequestParam int quantity) {
+        return orderService.addProductQuantity(productId, quantity);
     }
     @GetMapping("/all")
     public List<Order> getAllOrders() {

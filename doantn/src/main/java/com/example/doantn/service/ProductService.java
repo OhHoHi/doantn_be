@@ -64,6 +64,10 @@ public class ProductService {
             product.setChuViCanCam(productDTO.getChuViCanCam());
             product.setTrinhDoChoi(productDTO.getTrinhDoChoi());
             product.setNoiDungChoi(productDTO.getNoiDungChoi());
+
+            // Thêm totalQuantity từ ProductDTO
+            product.setTotalQuantity(productDTO.getTotalQuantity());
+
             productRepository.save(product);
 
             // Tạo một đối tượng UploadResponse với thông điệp và danh sách tên ảnh
@@ -153,6 +157,19 @@ public class ProductService {
             existingProduct.setChuViCanCam(productDTO.getChuViCanCam());
             existingProduct.setTrinhDoChoi(productDTO.getTrinhDoChoi());
             existingProduct.setNoiDungChoi(productDTO.getNoiDungChoi());
+
+            // Kiểm tra và cập nhật totalQuantity nếu có
+            if (productDTO.getTotalQuantity() != 0) {
+                existingProduct.setTotalQuantity(productDTO.getTotalQuantity());
+                // Cập nhật trạng thái của sản phẩm dựa trên totalQuantity
+                if (productDTO.getTotalQuantity() == 0) {
+                    existingProduct.setStatus("Hết hàng");
+                } else {
+                    existingProduct.setStatus("Còn hàng");
+                }
+            }
+
+
             // Lưu thông tin sản phẩm đã cập nhật và trả về
             return productRepository.save(existingProduct);
         } else {

@@ -1,9 +1,6 @@
 package com.example.doantn.service;
 
-import com.example.doantn.dto.MonthlyRevenueDTO;
-import com.example.doantn.dto.OrderItemDTO;
-import com.example.doantn.dto.OrderRequest;
-import com.example.doantn.dto.ProductRevenueDTO;
+import com.example.doantn.dto.*;
 import com.example.doantn.entity.*;
 import com.example.doantn.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,10 +10,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 
 @Service
@@ -69,6 +63,10 @@ public class OrderService {
         for (OrderItemDTO orderItemDTO : orderItemDTOs) {
             Product product = productRepository.findById(orderItemDTO.getProductId())
                     .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+            // Giảm số lượng sản phẩm và cập nhật trạng thái nếu cần
+            product.reduceQuantity(orderItemDTO.getQuantity());
+            productRepository.save(product);
+
             OrderItem orderItem = new OrderItem(order, product, orderItemDTO.getQuantity());
             orderItems.add(orderItem);
             orderItemRepository.save(orderItem);
@@ -76,6 +74,20 @@ public class OrderService {
 
         order.setOrderItems(orderItems);
         return order;
+    }
+    public String addProductQuantity(Long productId, int quantity) {
+        Optional<Product> optionalProduct = productRepository.findById(productId);
+
+        if (!optionalProduct.isPresent()) {
+            return "Product not found";
+        }
+
+        Product product = optionalProduct.get();
+        product.setTotalQuantity(product.getTotalQuantity() + quantity);
+        product.addQuantity();
+        productRepository.save(product);
+
+        return "Product quantity updated successfully";
     }
     public List<Order> getAllOrders() {
         return orderRepository.findAll();
@@ -108,6 +120,33 @@ public class OrderService {
         order.setStatus(newStatus);
         return orderRepository.save(order);
     }
+//public Order decreaseOrderStatus(Long orderId) {
+//    Order order = orderRepository.findById(orderId)
+//            .orElseThrow(() -> new IllegalArgumentException("Order not found"));
+//
+//    // Giảm trạng thái của đơn hàng đi một đơn vị
+//    int newStatus = order.getStatus() - 1;
+//    order.setStatus(newStatus);
+//
+//    // Lấy ra tất cả các mục đơn hàng của đơn hàng
+//    Set<OrderItem> orderItems = order.getOrderItems();
+//
+//    // In ra thông tin của orderItems để kiểm tra
+//    System.out.println("OrderItems: " + orderItems);
+//
+//    for (OrderItem orderItem : orderItems) {
+//        Product product = orderItem.getProduct();
+//        int quantity = orderItem.getQuantity();
+//        // Cộng trả lại số lượng sản phẩm vào kho
+//        int newQuantity = product.getTotalQuantity() + quantity;
+//        product.setTotalQuantity(newQuantity);
+//        // Lưu thay đổi số lượng sản phẩm vào cơ sở dữ liệu
+//        productRepository.save(product);
+//    }
+//
+//    // Lưu thay đổi trạng thái và số lượng sản phẩm vào cơ sở dữ liệu và trả về đơn hàng đã được cập nhật
+//    return orderRepository.save(order);
+//}
     private void createAndSaveNotification(Order order, int newStatus) {
         String message;
         switch (newStatus) {

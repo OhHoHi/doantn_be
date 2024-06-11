@@ -26,4 +26,5 @@ public class ProductDTO {
     private String chuViCanCam;
     private String trinhDoChoi;
     private String noiDungChoi;
+    private int totalQuantity; // Thêm trường này
 }

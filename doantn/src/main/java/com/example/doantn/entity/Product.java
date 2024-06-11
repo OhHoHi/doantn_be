@@ -70,4 +70,23 @@ public class Product {
     @ManyToOne
     @JoinColumn(name = "brands_id")
     private Brands brands;
+
+    @Column(name = "total_quantity")
+    private int totalQuantity;
+
+    public void reduceQuantity(int quantity) {
+        if (this.totalQuantity >= quantity) {
+            this.totalQuantity -= quantity;
+            if (this.totalQuantity == 0) {
+                this.status = "Hết hàng";
+            }
+        } else {
+//            throw new IllegalArgumentException("Không đủ số lượng sản phẩm");
+        }
+    }
+    public void addQuantity() {
+        if (this.totalQuantity > 0) {
+            this.status = "Còn hàng";
+        }
+    }
 }
